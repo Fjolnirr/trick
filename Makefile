@@ -11,6 +11,7 @@
 # 'doxygen' - Generate HTML User's Guide.
 # 'test'    - Run Unit-tests and Simulation Tests.
 
+CXXFLAGS = -std=c++11 -g
 export TRICK_HOME = $(CURDIR)
 
 # Include the build configuration information.
