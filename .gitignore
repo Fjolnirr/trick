@@ -43,3 +43,11 @@ trickops_logs/
 coverage.info
 *.dSYM
 *.log
+
+# This is generated because of the SIMS runned through vscodes gdb debugger
+varserver_log
+send_hs
+S_run_summary
+S_job_execution
+DP_Product
+DP_Product/
