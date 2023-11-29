@@ -11,6 +11,7 @@
 # 'doxygen' - Generate HTML User's Guide.
 # 'test'    - Run Unit-tests and Simulation Tests.
 
+CXX = g++
 CXXFLAGS = -std=c++11 -g
 export TRICK_HOME = $(CURDIR)
 
@@ -199,7 +200,7 @@ $(ER7_UTILS_DIRS): icg_sim_serv
 # Replace -isystem with -I so ICG doesn't skip Trick headers
 icg_sim_serv: TRICK_SYSTEM_CXXFLAGS := $(subst -isystem,-I,$(TRICK_SYSTEM_CXXFLAGS))
 icg_sim_serv: $(ICG_EXE)
-	${ICG_EXE} -sim_services -m ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
+	${ICG_EXE} -sim_services -g -m ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
 
 # 1.1.1.4.1 Build the Interface Code Generator (ICG) executable.
 $(ICG_EXE) :
@@ -288,6 +289,12 @@ premade:
 	@ $(MAKE) -C ${TRICK_HOME}/trick_source/sim_services/MemoryManager premade
 	@ $(MAKE) -C ${TRICK_HOME}/trick_source/sim_services/CheckPointAgent premade
 	@ $(MAKE) -C ${TRICK_HOME}/trick_source/java
+
+# 1.6 this for sim artifacts generated in trick dir
+.PHONY: sc
+sc:
+	rm -rf varserver_log send_hs S_run_summary S_job_execution DP_Product DP_Product/ _init_log.csv
+
 
 ################################################################################
 #                                   TESTING
@@ -486,7 +493,7 @@ uninstall:
 # Replace -isystem with -I so ICG doesn't skip Trick headers
 ICG: TRICK_SYSTEM_CXXFLAGS := $(subst -isystem,-I,$(TRICK_SYSTEM_CXXFLAGS))
 ICG: $(ICG_EXE)
-	$(ICG_EXE) -f -s -m -n ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
+	$(ICG_EXE) -f -s -m -n -g ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
 
 
 ICG_EXE: force-icg-build
