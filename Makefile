@@ -11,8 +11,9 @@
 # 'doxygen' - Generate HTML User's Guide.
 # 'test'    - Run Unit-tests and Simulation Tests.
 
-CXX = g++
-CXXFLAGS = -std=c++11 -g
+CXX += g++
+CXXFLAGS += -std=c++11 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
+
 export TRICK_HOME = $(CURDIR)
 
 # Include the build configuration information.
