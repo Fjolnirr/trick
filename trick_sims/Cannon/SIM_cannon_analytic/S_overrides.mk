@@ -1,6 +1,9 @@
+TRICK_CFLAGS += -I../models -I/home/fjolnirr/trick/trick_source -g 
+TRICK_CXXFLAGS += -I../models -I/home/fjolnirr/trick/trick_source -g 			
 
-TRICK_CFLAGS += -I../models -I/home/fjolnirr/trick/trick_source -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
+TRICK_EXEC_LINK_LIBS += -L/usr/local/lib -lpthread -lcrypto \
+-lssl -lmongocxx -lbsoncxx
 
-TRICK_CXXFLAGS += -I../models -I/home/fjolnirr/trick/trick_source -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
-
+# add the line below to the .bashrc for permanent solution
+# export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
