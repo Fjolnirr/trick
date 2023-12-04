@@ -12,7 +12,7 @@ PROGRAMMERS:
 #include <string.h>
 
 #include "trick/mongodb_handler.hh"
-#include "mongocxx/instance.hpp"
+#include "MongoInstance.hpp"
 
 #include "trick/DRAscii.hh"
 #include "trick/command_line_protos.h"
@@ -47,6 +47,8 @@ int Trick::DRAscii::format_specific_header( std::fstream & out_st ) {
    and restored
 */
 int Trick::DRAscii::format_specific_init() {
+    
+     mongocxx::instance& mongo_instance = MongoInstance::get_instance();
 
     unsigned int jj ;
     std::streampos before_write;
@@ -120,11 +122,7 @@ void print_result(const bool &result, const char *operation)
 */
 int Trick::DRAscii::format_specific_write_data(unsigned int writer_offset) {
 
-    mongocxx::instance instance;
-    trick::MongoDbHandler mongoDbHandler;
-
-    bool result = mongoDbHandler.AddCharacterToDb("Fjolnirr", trick::CharacterSize::Large, 0);
-    print_result(result, "add");
+    trick::MongoDbHandler mongoDbHandler; //TODO At this line executive loop throws an exception take care of it.
 
     unsigned int ii ;
     char *buf;
@@ -144,6 +142,9 @@ int Trick::DRAscii::format_specific_write_data(unsigned int writer_offset) {
     }
 
     out_stream << writer_buff << std::endl ;
+    std::cout << writer_buff << std::endl;
+    bool result = mongoDbHandler.AddCharacterToDb(writer_buff, trick::CharacterSize::Large, 0);
+    print_result(result, writer_buff);
 
     /*! Flush the output */
     out_stream.flush() ;
@@ -158,6 +159,7 @@ int Trick::DRAscii::format_specific_write_data(unsigned int writer_offset) {
 int Trick::DRAscii::format_specific_shutdown() {
 
     if ( inited ) {
+
         out_stream.close() ;
     }
     return(0) ;
