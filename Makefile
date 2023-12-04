@@ -12,7 +12,14 @@
 # 'test'    - Run Unit-tests and Simulation Tests.
 
 CXX += g++
-CXXFLAGS += -std=c++11 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
+CXXFLAGS += -std=c++11 -g 
+
+TRICK_CXX += -Iinclude -Ilib \
+ 			-I/usr/local/include/mongocxx/v_noabi \
+ 			-I/usr/local/include/bsoncxx/v_noabi			
+
+TRICK_EXEC_LINK_LIBS += -lpthread -lcrypto \
+-lssl -lmongocxx -lbsoncxx
 
 export TRICK_HOME = $(CURDIR)
 
@@ -223,8 +230,7 @@ $(SWIG_DIRS): icg_sim_serv $(TRICK_LIB_DIR)
 # 1.2 Build Trick's Data-products Applications.
 .PHONY: dp
 dp: ${TRICK_HOME}/trick_source/trick_utils/units
-	@ $(MAKE) -C ${TRICK_HOME}/trick_source/data_products
-
+	@ $(MAKE) -C ${TRICK_HOME}/trick_source/data_products 
 #-------------------------------------------------------------------------------
 #
 
