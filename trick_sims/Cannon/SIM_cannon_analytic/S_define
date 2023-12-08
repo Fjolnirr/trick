@@ -19,7 +19,7 @@ class CannonSimObject : public Trick::SimObject {
         CannonSimObject() {
             ("default_data") cannon_default_data( &cannon ) ;
             ("initialization") cannon_init( &cannon ) ;
-            (0.01, "scheduled") cannon_analytic( &cannon ) ;       
+            (0.1, "scheduled") cannon_analytic( &cannon ) ;       
         }
 } ;
 
