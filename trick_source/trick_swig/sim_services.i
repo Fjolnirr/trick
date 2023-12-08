@@ -44,6 +44,7 @@
 #include "trick/CommandLineArguments.hh"
 #include "trick/command_line_protos.h"
 #include "trick/DRAscii.hh"
+#include "trick/DRMongo.hh"
 #include "trick/DRBinary.hh"
 #ifdef HDF5
 #include "trick/DRHDF5.hh"
