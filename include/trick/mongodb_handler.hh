@@ -35,7 +35,7 @@ namespace trick
 
     class MongoDbHandler
     {
-
+// TODO This class might be deleted and functions here be used in DRMongo class. Decide it later.
     public:
         MongoDbHandler()
             : uri(mongocxx::uri(mongoDbUri)),
@@ -58,63 +58,34 @@ namespace trick
             return true;
         }
 
-        // bool add(const std::vector<std::string> &params) {
-        //     mongocxx::collection collection = db[collectionName];
-        //     auto builder = bsoncxx::builder::stream::document{};
-
-        //     for (int i = 0; i < params.size(); ++i) {
-        //         builder << var_name[i] << params[i];
-        //     }   
-        // }
-
-        bool UpdateWins(const std::string &character_id)
-        {
+        bool add(bsoncxx::builder::stream::document& builder) {
             mongocxx::collection collection = db[collectionName];
-            auto builder = bsoncxx::builder::stream::document{};
-
-            bsoncxx::oid document_id(character_id);
-
-            bsoncxx::document::value query_doc =
-                builder << "_id" << document_id
-                        << bsoncxx::builder::stream::finalize;
-
-            bsoncxx::document::value update_doc =
-                builder << "$inc" << bsoncxx::builder::stream::open_document
-                        << "wins" << 1
-                        << bsoncxx::builder::stream::close_document
-                        << bsoncxx::builder::stream::finalize;
-
-            bsoncxx::stdx::optional<mongocxx::result::update> maybe_result =
-                collection.update_one(query_doc.view(), update_doc.view());
-
-            if (maybe_result)
-            {
-                return maybe_result->modified_count() == 1;
-            }
-
-            return false;
+            bsoncxx::document::value doc = builder << bsoncxx::builder::stream::finalize;
+            collection.insert_one(doc.view());
+            return true;
         }
 
-        bool RemoveCharacterFromDb(const std::string &character_id)
-        {
+        bool add(const std::string &param_names, const std::string &param_values) {
+            
             mongocxx::collection collection = db[collectionName];
             auto builder = bsoncxx::builder::stream::document{};
+            // Check if the sizes of param_names and param_values are the same
+            // if (param_names.size() != param_values.size()) {
+            //     std::cout << "ERROR: Sizes don't match\n";
+            //     return false;
+            // }
 
-            bsoncxx::oid document_id(character_id);
+            // for (size_t i = 0; i < param_names.size(); ++i) {
+            //     // Use "concat" or "append" to add key-value pairs to the BSON document
+            //     builder = builder << param_names[i] << param_values[i];
 
-            bsoncxx::document::value query_doc =
-                builder << "_id" << document_id
-                        << bsoncxx::builder::stream::finalize;
+            // }
 
-            bsoncxx::stdx::optional<mongocxx::result::delete_result> maybe_result =
-                collection.delete_one(query_doc.view());
+            builder << param_names << param_values;
 
-            if (maybe_result)
-            {
-                return maybe_result->deleted_count() == 1;
-            }
-
-            return false;
+            bsoncxx::document::value doc_to_add = builder << bsoncxx::builder::stream::finalize;
+            collection.insert_one(doc_to_add.view());
+            return true;
         }
 
     private:

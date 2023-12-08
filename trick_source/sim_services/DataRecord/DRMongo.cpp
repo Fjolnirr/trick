@@ -125,21 +125,33 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 
     buf = writer_buff ;
 
+    auto myjson = bsoncxx::builder::stream::document{};
+
     /* Write out the first parameters (time) */
     copy_data_ascii_item(rec_buffer[0], writer_offset, buf );
-    buf += strlen(buf);
+    // buf += strlen(buf);
+    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
+    std::cout << rec_buffer[0]->ref->reference << " buf : " << buf << std::endl;
+    std::cout << rec_buffer[0]->ref->reference << " writer_buff : " << writer_buff << std::endl;
+    myjson << std::string(rec_buffer[0]->ref->reference) << std::string(writer_buff);
+    std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
     /* Write out all other parameters */
     for (ii = 1; ii < rec_buffer.size() ; ii++) {
-        strcat(buf, delimiter.c_str() );
-        buf += delimiter.length() ;
-        copy_data_ascii_item(rec_buffer[ii], writer_offset, buf );
-        buf += strlen(buf);
+        // strcat(buf, delimiter.c_str() );
+        // buf += delimiter.length() ;
+        copy_data_ascii_item(rec_buffer[ii], writer_offset, buf ); // This function is responsible for copying the value of the current parameter to the buf
+        // buf += strlen(buf);
+        std::cout << rec_buffer[ii]->ref->reference << "buf : " << buf << std::endl;
+        std::cout << rec_buffer[ii]->ref->reference << "writer_buff : " << writer_buff << std::endl;
+        myjson << std::string(rec_buffer[ii]->ref->reference) << std::string(writer_buff);
+        std::cout << "------------------------------------------------------------------\n";
     }
 
+    bool result = mongoDbHandler.add(myjson);
+
     out_stream << writer_buff << std::endl ;
-    std::cout << writer_buff << std::endl;
-    bool result = mongoDbHandler.AddCharacterToDb(writer_buff, trick::CharacterSize::Large, 0);
+    
 
     /*! Flush the output */
     out_stream.flush() ;
