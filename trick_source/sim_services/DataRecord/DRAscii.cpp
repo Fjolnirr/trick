@@ -11,9 +11,6 @@ PROGRAMMERS:
 #include <stdlib.h>
 #include <string.h>
 
-#include "trick/mongodb_handler.hh"
-#include "MongoInstance.hpp"
-
 #include "trick/DRAscii.hh"
 #include "trick/command_line_protos.h"
 #include "trick/memorymanager_c_intf.h"
@@ -48,8 +45,6 @@ int Trick::DRAscii::format_specific_header( std::fstream & out_st ) {
 */
 int Trick::DRAscii::format_specific_init() {
     
-     mongocxx::instance& mongo_instance = MongoInstance::get_instance();
-
     unsigned int jj ;
     std::streampos before_write;
 
@@ -106,11 +101,6 @@ int Trick::DRAscii::format_specific_init() {
     return(0) ;
 }
 
-
-void print_result(const bool &result, const char *operation)
-{
-    std::cout << operation << (result ? " worked." : " didnt work.") << std::endl;
-}
 /**
 @details
 -# While there is data in memory that has not been written to disk
@@ -121,8 +111,6 @@ void print_result(const bool &result, const char *operation)
 -# Return the number of bytes written
 */
 int Trick::DRAscii::format_specific_write_data(unsigned int writer_offset) {
-
-    trick::MongoDbHandler mongoDbHandler; //TODO At this line executive loop throws an exception take care of it.
 
     unsigned int ii ;
     char *buf;
@@ -142,9 +130,6 @@ int Trick::DRAscii::format_specific_write_data(unsigned int writer_offset) {
     }
 
     out_stream << writer_buff << std::endl ;
-    std::cout << writer_buff << std::endl;
-    bool result = mongoDbHandler.AddCharacterToDb(writer_buff, trick::CharacterSize::Large, 0);
-    print_result(result, writer_buff);
 
     /*! Flush the output */
     out_stream.flush() ;

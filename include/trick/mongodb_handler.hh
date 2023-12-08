@@ -58,6 +58,15 @@ namespace trick
             return true;
         }
 
+        // bool add(const std::vector<std::string> &params) {
+        //     mongocxx::collection collection = db[collectionName];
+        //     auto builder = bsoncxx::builder::stream::document{};
+
+        //     for (int i = 0; i < params.size(); ++i) {
+        //         builder << var_name[i] << params[i];
+        //     }   
+        // }
+
         bool UpdateWins(const std::string &character_id)
         {
             mongocxx::collection collection = db[collectionName];
