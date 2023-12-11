@@ -54,6 +54,10 @@ namespace Trick {
             /** Delimiter for separating ascii format fields.\n */
             std::string delimiter;           /**< trick_units(--) */
 
+            std::string mongoDbUri;
+            std::string databaseName; 
+            std::string collectionName; 
+
             #ifndef SWIG
             /**
              @brief DRMongo default constructor.
@@ -130,6 +134,10 @@ namespace Trick {
              @return always 0
             */
             virtual int set_single_prec_only(bool in_single_prec_only) ;
+
+            int set_mongoDbUri( std::string in_mongoDbUri );
+            int set_databaseName( std::string in_databaseName ) ;
+            int set_collectionName( std::string in_collectionName );
 
         private:
 

@@ -26,6 +26,11 @@ Trick::DRMongo::DRMongo( std::string in_name ) : Trick::DataRecordGroup( in_name
     ascii_float_format = "%20.8g" ;
     ascii_double_format = "%20.16g" ;
     delimiter = ",";
+
+    mongoDbUri = "";
+    databaseName = "trick"; 
+    collectionName = in_name; 
+
     register_group_with_mm(this, "Trick::DRMongo") ;
 }
 
@@ -79,7 +84,7 @@ int Trick::DRMongo::format_specific_init() {
 */
 int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 
-    trick::MongoDbHandler mongoDbHandler; //TODO move this to the constructor later
+    trick::MongoDbHandler mongoDbHandler(mongoDbUri, databaseName, collectionName); //TODO move this to the constructor later
 
     unsigned int ii ;
     char *buf;
@@ -238,4 +243,20 @@ int Trick::DRMongo::copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item
     }
 
     return(0) ;
+}
+
+int Trick::DRMongo::set_mongoDbUri( std::string in_mongoDbUri ) {
+    mongoDbUri = in_mongoDbUri;
+    std::cout << mongoDbUri << std::endl;
+    return(0);
+}
+
+int Trick::DRMongo::set_databaseName( std::string in_databaseName ) {
+    databaseName = in_databaseName;
+    return(0);
+}
+
+int Trick::DRMongo::set_collectionName( std::string in_collectionName ) {
+    collectionName = in_collectionName;
+    return(0);
 }
