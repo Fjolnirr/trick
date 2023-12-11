@@ -28,10 +28,10 @@ namespace trick
                                                                               {CharacterSize::Large, "large"}});
     
 
-    constexpr char mongoDbUri[] = "mongodb://rootuser:rootpass@10.41.74.77:27017";
+    constexpr char mongoDbUri[] = "mongodb://rootuser:rootpass@10.41.74.77:27017"; //TODO this constant shall be request from user by input.py
 
-    constexpr char databaseName[] = "learning_mongocxx";
-    constexpr char collectionName[] = "MarioKartCharacters";
+    constexpr char databaseName[] = "trickDre"; //TODO this constant shall be request from user by input.py
+    constexpr char collectionName[] = "CannonAnalytic"; //TODO this constant shall be request from user by input.py
 
     class MongoDbHandler
     {
