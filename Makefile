@@ -10,6 +10,7 @@
 # 'javadoc' - Generate Java Documentation.
 # 'doxygen' - Generate HTML User's Guide.
 # 'test'    - Run Unit-tests and Simulation Tests.
+# 'sc' 		- clear sim artifacts at workspacefolder
 
 CXX += g++
 CXXFLAGS += -std=c++11 -g 
