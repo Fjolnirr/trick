@@ -53,13 +53,6 @@ int Trick::DRMongo::format_specific_init() {
     unsigned int jj ;
     std::streampos before_write;
 
-    /* Store log information in csv/txt file */
-    if ( ! delimiter.empty()  &&  delimiter.compare(",") != 0 ) {
-        file_name.append(".txt");
-    } else {
-        file_name.append(".csv");
-    }
-
     /* Calculate a "worst case" for space used for 1 record. */
     writer_buff_size = record_size * rec_buffer.size();
     writer_buff = (char *)calloc(1 , writer_buff_size) ;
@@ -71,38 +64,6 @@ int Trick::DRMongo::format_specific_init() {
     }
     writer_buff[record_size * rec_buffer.size() - 1] = 1 ;
 
-    out_stream.open(file_name.c_str(), std::fstream::out | std::fstream::app ) ;
-    if ( !out_stream || !out_stream.good() ) {
-        message_publish(MSG_ERROR, "Can't open Data Record file %s.\n", file_name.c_str()) ;
-        record = false ;
-        return -1 ;
-    }
-    before_write = out_stream.tellp();
-    // Write out the title line of the recording file
-    /* Start with the 1st item in the buffer which should be "sys.exec.out.time" */
-    out_stream << rec_buffer[0]->ref->reference ;
-    if ( rec_buffer[0]->ref->attr->units != NULL ) {
-        if ( rec_buffer[0]->ref->attr->mods & TRICK_MODS_UNITSDASHDASH ) {
-            out_stream << " {--}" ;
-        } else {
-            out_stream << " {" << rec_buffer[0]->ref->attr->units << "}" ;
-        }
-    }
-    
-    /* Write out specified recorded parameters */
-    for (jj = 1; jj < rec_buffer.size() ; jj++) {
-        out_stream << delimiter << rec_buffer[jj]->ref->reference ;
-
-        if ( rec_buffer[jj]->ref->attr->units != NULL ) {
-            if ( rec_buffer[jj]->ref->attr->mods & TRICK_MODS_UNITSDASHDASH ) {
-                out_stream << " {--}" ;
-            } else {
-                out_stream << " {" << rec_buffer[jj]->ref->attr->units << "}" ;
-            }
-        }
-    }
-    out_stream << std::endl ;
-    total_bytes_written += out_stream.tellp() - before_write;
     return(0) ;
 }
 
@@ -150,11 +111,6 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 
     bool result = mongoDbHandler.add(myjson);
 
-    out_stream << writer_buff << std::endl ;
-    
-
-    /*! Flush the output */
-    out_stream.flush() ;
     /*! +1 for endl */
     return(strlen(writer_buff) + 1) ;
 }
@@ -166,8 +122,7 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 int Trick::DRMongo::format_specific_shutdown() {
 
     if ( inited ) {
-
-        out_stream.close() ;
+        std::cout << "MONGODB shutdown" << std::endl;
     }
     return(0) ;
 }
