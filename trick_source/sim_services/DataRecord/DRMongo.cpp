@@ -96,11 +96,11 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
     /* Write out the first parameters (time) */
     copy_data_ascii_item(rec_buffer[0], writer_offset, buf );
     // buf += strlen(buf);
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
-    std::cout << rec_buffer[0]->ref->reference << " buf : " << buf << std::endl;
-    std::cout << rec_buffer[0]->ref->reference << " writer_buff : " << writer_buff << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
+    // std::cout << rec_buffer[0]->ref->reference << " buf : " << buf << std::endl;
+    // std::cout << rec_buffer[0]->ref->reference << " writer_buff : " << writer_buff << std::endl;
     myjson << std::string(rec_buffer[0]->ref->reference) << std::string(writer_buff);
-    std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+    // std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
     /* Write out all other parameters */
     for (ii = 1; ii < rec_buffer.size() ; ii++) {
@@ -108,10 +108,10 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
         // buf += delimiter.length() ;
         copy_data_ascii_item(rec_buffer[ii], writer_offset, buf ); // This function is responsible for copying the value of the current parameter to the buf
         // buf += strlen(buf);
-        std::cout << rec_buffer[ii]->ref->reference << "buf : " << buf << std::endl;
-        std::cout << rec_buffer[ii]->ref->reference << "writer_buff : " << writer_buff << std::endl;
+        // std::cout << rec_buffer[ii]->ref->reference << "buf : " << buf << std::endl;
+        // std::cout << rec_buffer[ii]->ref->reference << "writer_buff : " << writer_buff << std::endl;
         myjson << std::string(rec_buffer[ii]->ref->reference) << std::string(writer_buff);
-        std::cout << "------------------------------------------------------------------\n";
+        // std::cout << "------------------------------------------------------------------\n";
     }
 
     bool result = mongoDbHandler.add(myjson);
@@ -127,7 +127,7 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 int Trick::DRMongo::format_specific_shutdown() {
 
     if ( inited ) {
-        std::cout << "MONGODB shutdown" << std::endl;
+        // std::cout << "MONGODB shutdown" << std::endl;
     }
     return(0) ;
 }
@@ -247,7 +247,7 @@ int Trick::DRMongo::copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item
 
 int Trick::DRMongo::set_mongoDbUri( std::string in_mongoDbUri ) {
     mongoDbUri = in_mongoDbUri;
-    std::cout << mongoDbUri << std::endl;
+    // std::cout << mongoDbUri << std::endl;
     return(0);
 }
 
