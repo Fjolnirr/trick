@@ -90,16 +90,16 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
     char *buf;
 
     buf = writer_buff ;
-
-    auto myjson = bsoncxx::builder::stream::document{};
-
+    nlohmann::json json;
+    
     /* Write out the first parameters (time) */
     copy_data_ascii_item(rec_buffer[0], writer_offset, buf );
     // buf += strlen(buf);
     // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
     // std::cout << rec_buffer[0]->ref->reference << " buf : " << buf << std::endl;
     // std::cout << rec_buffer[0]->ref->reference << " writer_buff : " << writer_buff << std::endl;
-    myjson << std::string(rec_buffer[0]->ref->reference) << std::string(writer_buff);
+    // myjson << std::string(rec_buffer[0]->ref->reference) << std::string(writer_buff);
+    json = variable_string_to_json(json, std::string(rec_buffer[0]->ref->reference), std::string(writer_buff));
     // std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
     /* Write out all other parameters */
@@ -110,11 +110,17 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
         // buf += strlen(buf);
         // std::cout << rec_buffer[ii]->ref->reference << "buf : " << buf << std::endl;
         // std::cout << rec_buffer[ii]->ref->reference << "writer_buff : " << writer_buff << std::endl;
-        myjson << std::string(rec_buffer[ii]->ref->reference) << std::string(writer_buff);
+        // myjson << std::string(rec_buffer[ii]->ref->reference) << std::string(writer_buff);
+        json = variable_string_to_json(json, std::string(rec_buffer[ii]->ref->reference), std::string(writer_buff));
+
         // std::cout << "------------------------------------------------------------------\n";
     }
-
-    bool result = mongoDbHandler.add(myjson);
+    
+    // serialize it to BSON 
+    std::vector<std::uint8_t> v = nlohmann::json::to_bson(json);
+    // create a bsoncxx::document::view from the data
+    auto fullDocument = bsoncxx::document::view(v.data(), v.size());
+    mongoDbHandler.add(fullDocument);
 
     /*! +1 for endl */
     return(strlen(writer_buff) + 1) ;
@@ -259,4 +265,14 @@ int Trick::DRMongo::set_databaseName( std::string in_databaseName ) {
 int Trick::DRMongo::set_collectionName( std::string in_collectionName ) {
     collectionName = in_collectionName;
     return(0);
+}
+
+nlohmann::json Trick::DRMongo::variable_string_to_json(nlohmann::json j, std::string str, std::string value){
+    replace(str.begin(), str.end(), '.', '/');
+    replace(str.begin(), str.end(), '[', '/');
+    str.erase(remove(str.begin(), str.end(), ']'), str.end());
+
+    j[nlohmann::json::json_pointer('/' + str)] = value;
+    std::cout << j.dump() << "\n";
+    return j;
 }

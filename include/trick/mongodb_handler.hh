@@ -30,6 +30,11 @@ namespace trick
             collection.insert_one(doc.view());
             return true;
         }
+        bool add(bsoncxx::document::view& docView) {
+            mongocxx::collection collection = db[_collectionName];
+            collection.insert_one(docView);
+            return true;
+        }
 
     private:
         mongocxx::uri uri;

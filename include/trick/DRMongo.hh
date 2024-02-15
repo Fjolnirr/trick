@@ -11,6 +11,9 @@ PROGRAMMERS:
 #include <string>
 
 #include "trick/DataRecordGroup.hh"
+#include "./nlohmann/json.hpp"
+
+
 
 #ifdef SWIG
 %feature("shadow") Trick::DRMongo::DRMongo(std::string in_name) %{
@@ -146,6 +149,13 @@ namespace Trick {
              @return always 0
             */
             int copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item_num, char *buf ) ;
+
+            /**
+             * @brief Turns variable strings into json format
+             * @return json
+            */
+            nlohmann::json variable_string_to_json(nlohmann::json j, std::string str, std::string value);
+
 
             /** Output stream for the log file */
             std::fstream out_stream ; /**< trick_io(**)  */
