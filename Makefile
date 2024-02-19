@@ -12,15 +12,10 @@
 # 'test'    - Run Unit-tests and Simulation Tests.
 # 'sc' 		- clear sim artifacts at workspacefolder
 
-CXX += g++
-CXXFLAGS += -std=c++11 -g 
-
-TRICK_CXX += -Iinclude -Ilib \
- 			-I/usr/local/include/mongocxx/v_noabi \
- 			-I/usr/local/include/bsoncxx/v_noabi			
-
-TRICK_EXEC_LINK_LIBS += -lpthread -lcrypto \
--lssl -lmongocxx -lbsoncxx
+TRICK_CXXFLAGS += -O0 -g -I/usr/local/include/mongocxx/v_noabi \
+ 			-I/usr/local/include/bsoncxx/v_noabi \
+			-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc \
+			-L/usr/local/lib -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
 
 export TRICK_HOME = $(CURDIR)
 

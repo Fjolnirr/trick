@@ -32,7 +32,6 @@ trick-offline
 *sim_services_classes.resource
 civetweb_clone/
 include/civet/
-.vscode/
 civet_server_error.log
 server.pem
 archive/
