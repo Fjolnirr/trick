@@ -11,7 +11,7 @@ PROGRAMMERS:
 #include <string>
 
 #include "trick/DataRecordGroup.hh"
-#include "./nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 
 

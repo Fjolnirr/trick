@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 // "/usr/local/include/bsoncxx/v_noabi" include this to  include path
-#include "bsoncxx/builder/stream/document.hpp"
+// #include "bsoncxx/builder/stream/document.hpp"
 #include "bsoncxx/json.hpp"
 #include "bsoncxx/oid.hpp"
 #include "mongocxx/client.hpp"
@@ -24,12 +24,12 @@ namespace trick
               db(client[databaseName]),
           _collectionName(collectionName) {}
                 
-        bool add(bsoncxx::builder::stream::document& builder) {
-            mongocxx::collection collection = db[_collectionName];
-            bsoncxx::document::value doc = builder << bsoncxx::builder::stream::finalize;
-            collection.insert_one(doc.view());
-            return true;
-        }
+        // bool add(bsoncxx::builder::stream::document& builder) {
+        //     mongocxx::collection collection = db[_collectionName];
+        //     bsoncxx::document::value doc = builder << bsoncxx::builder::stream::finalize;
+        //     collection.insert_one(doc.view());
+        //     return true;
+        // }
         bool add(bsoncxx::document::view& docView) {
             mongocxx::collection collection = db[_collectionName];
             collection.insert_one(docView);
