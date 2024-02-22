@@ -17,7 +17,8 @@ export TRICK_HOME = $(CURDIR)
 # Include the build configuration information.
 include $(TRICK_HOME)/share/trick/makefiles/Makefile.common
 
-TRICK_CXXFLAGS += -O0 -g -I/usr/local/include/mongocxx/v_noabi \
+TRICK_CXXFLAGS += -O0 -g -I${TRICK_HOME}/third_party \
+			-I/usr/local/include/mongocxx/v_noabi \
  			-I/usr/local/include/bsoncxx/v_noabi \
 			-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
 

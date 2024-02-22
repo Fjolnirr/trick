@@ -83,6 +83,7 @@ int Trick::DRMongo::format_specific_init() {
 -# Return the number of bytes written
 */
 int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
+    #ifndef SWIG
 
     trick::MongoDbHandler mongoDbHandler(mongoDbUri, databaseName, collectionName); //TODO move this to the constructor later
 
@@ -94,38 +95,32 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
     
     /* Write out the first parameters (time) */
     copy_data_ascii_item(rec_buffer[0], writer_offset, buf );
-    // buf += strlen(buf);
-    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
-    // std::cout << rec_buffer[0]->ref->reference << " buf : " << buf << std::endl;
-    // std::cout << rec_buffer[0]->ref->reference << " writer_buff : " << writer_buff << std::endl;
-    // myjson << std::string(rec_buffer[0]->ref->reference) << std::string(writer_buff);
     json = variable_string_to_json(json, std::string(rec_buffer[0]->ref->reference), std::string(writer_buff));
-    // std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
     /* Write out all other parameters */
     for (ii = 1; ii < rec_buffer.size() ; ii++) {
         // strcat(buf, delimiter.c_str() );
         // buf += delimiter.length() ;
         copy_data_ascii_item(rec_buffer[ii], writer_offset, buf ); // This function is responsible for copying the value of the current parameter to the buf
-        // buf += strlen(buf);
-        // std::cout << rec_buffer[ii]->ref->reference << "buf : " << buf << std::endl;
-        // std::cout << rec_buffer[ii]->ref->reference << "writer_buff : " << writer_buff << std::endl;
-        // myjson << std::string(rec_buffer[ii]->ref->reference) << std::string(writer_buff);
         json = variable_string_to_json(json, std::string(rec_buffer[ii]->ref->reference), std::string(writer_buff));
-
-        // std::cout << "------------------------------------------------------------------\n";
     }
     
     // serialize it to BSON 
     std::vector<std::uint8_t> v = nlohmann::json::to_bson(json);
+
     // create a bsoncxx::document::view from the data
     auto fullDocument = bsoncxx::document::view(v.data(), v.size());
     mongoDbHandler.add(fullDocument);
 
+    #endif
+
+    #ifdef SWIG
+    std::cout << "WARNING : SWIG usage blocking DRMongo format_specific_write_data" << endl;
+    #endif
+
     /*! +1 for endl */
     return(strlen(writer_buff) + 1) ;
 }
-
 /**
 @details
 -# Close the output file stream
@@ -253,7 +248,6 @@ int Trick::DRMongo::copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item
 
 int Trick::DRMongo::set_mongoDbUri( std::string in_mongoDbUri ) {
     mongoDbUri = in_mongoDbUri;
-    // std::cout << mongoDbUri << std::endl;
     return(0);
 }
 
@@ -266,13 +260,13 @@ int Trick::DRMongo::set_collectionName( std::string in_collectionName ) {
     collectionName = in_collectionName;
     return(0);
 }
-
+#ifndef SWIG
 nlohmann::json Trick::DRMongo::variable_string_to_json(nlohmann::json j, std::string str, std::string value){
     replace(str.begin(), str.end(), '.', '/');
     replace(str.begin(), str.end(), '[', '/');
     str.erase(remove(str.begin(), str.end(), ']'), str.end());
 
     j[nlohmann::json::json_pointer('/' + str)] = value;
-    std::cout << j.dump() << "\n";
     return j;
 }
+#endif

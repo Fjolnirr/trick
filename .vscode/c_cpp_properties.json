@@ -8,7 +8,7 @@
                 "/usr/local/include/mongocxx/v_noabi",
                 "/usr/local/include/bsoncxx/v_noabi/bsoncxx",
                 "/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc",
-                "${workspaceFolder}/third_party/include"
+                "${workspaceFolder}/third_party"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

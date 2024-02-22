@@ -11,8 +11,9 @@ PROGRAMMERS:
 #include <string>
 
 #include "trick/DataRecordGroup.hh"
+#ifndef SWIG
 #include "nlohmann/json.hpp"
-
+#endif
 
 
 #ifdef SWIG
@@ -149,13 +150,13 @@ namespace Trick {
              @return always 0
             */
             int copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item_num, char *buf ) ;
-
+#ifndef SWIG
             /**
              * @brief Turns variable strings into json format
              * @return json
             */
             nlohmann::json variable_string_to_json(nlohmann::json j, std::string str, std::string value);
-
+#endif
 
             /** Output stream for the log file */
             std::fstream out_stream ; /**< trick_io(**)  */
