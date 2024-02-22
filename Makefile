@@ -21,8 +21,6 @@ TRICK_CXXFLAGS += -O0 -g -I/usr/local/include/mongocxx/v_noabi \
  			-I/usr/local/include/bsoncxx/v_noabi \
 			-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
 
-# TRICK_EXEC_LINK_LIBS += -L/usr/local/lib -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx	
-
 #-------------------------------------------------------------------------------
 # Specify the contents of: libtrick.a
 #-------------------------------------------------------------------------------
