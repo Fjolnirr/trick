@@ -12,26 +12,14 @@
 # 'test'    - Run Unit-tests and Simulation Tests.
 # 'sc' 		- clear sim artifacts at workspacefolder
 
-# CXX += g++
-# CXXFLAGS += -Wall -Wextra -std=c++11 -g -I$(CURDIR)/third_party/include	
-
-# TRICK_CXX_FLAGS += -Iinclude -Ilib \
-#  			-I/usr/local/include/mongocxx/v_noabi \
-#  			-I/usr/local/include/bsoncxx/v_noabi \
-# 			-I$(CURDIR)/third_party/include	
-
-# TRICK_EXEC_LINK_LIBS += -lpthread -lcrypto \
-# -lssl -lmongocxx -lbsoncxx
-
 export TRICK_HOME = $(CURDIR)
-
-TRICK_CXXFLAGS += -O0 -g -I$(CURDIR)/third_party/include \
-				-I/usr/local/include/mongocxx/v_noabi \
- 				-I/usr/local/include/bsoncxx/v_noabi \
-				-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
 
 # Include the build configuration information.
 include $(TRICK_HOME)/share/trick/makefiles/Makefile.common
+
+TRICK_CXXFLAGS += -O0 -g -I/usr/local/include/mongocxx/v_noabi \
+ 			-I/usr/local/include/bsoncxx/v_noabi \
+			-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
 
 #-------------------------------------------------------------------------------
 # Specify the contents of: libtrick.a
