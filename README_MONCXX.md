@@ -1,18 +1,21 @@
 # How to make mongocxx lib work 
 
-paste this to the .bashrc file located at home dir.
+Run the `setup-mongocxx` file to install mongocxx driver to your system:
+- `sudo chmod +x setup-mongocxx`
+- `./setup-mongocxx`
+
+1- Add the line below to the ***Makefile.common (${TRICK_HOME}/share/trick/makefiles/Makefile.common)***
 
 ```
-export PATH=${PATH}:${HOME}/trick/bin
+# This is required for 3rd party MongoDB library
+TRICK_EXEC_LINK_LIBS += -L/usr/local/lib -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
+```
 
-export CFLAGS="$CFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export CXXFLAGS="$CXXFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export LDFLAGS="$LDFLAGS $1 -O0 -g -Wl -V -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export TRICK_CFLAGS="$TRICK_CFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export TRICK_CXXFLAGS="$TRICK_CXXFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export TRICK_LDFLAGS="$TRICK_LDFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export TRICK_SYSTEM_CFLAGS="$TRICK_SYSTEM_CFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export TRICK_SYSTEM_CXXFLAGS="$TRICK_SYSTEM_CXXFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export TRICK_SYSTEM_LDFLAGS="$TRICK_SYSTEM_LDFLAGS $1 -O0 -g -Iinclude -Ilib -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx"
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+2- Add the line below to the ***Makefile (${TRICK_HOME}/Makefile)***
+
+```
+TRICK_CXXFLAGS += -O0 -g -I${TRICK_HOME}/third_party \
+			-I/usr/local/include/mongocxx/v_noabi \
+ 			-I/usr/local/include/bsoncxx/v_noabi \
+			-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
 ```
