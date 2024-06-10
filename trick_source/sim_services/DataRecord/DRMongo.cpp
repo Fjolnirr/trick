@@ -98,15 +98,17 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 
     buf = writer_buff ;
     nlohmann::json json;
+    nlohmann::json jsonPayload;
+
     
     /* Write out the first parameters (time) */
     copy_data_ascii_item(rec_buffer[0], writer_offset, buf );
-    json = variable_string_to_json(json, std::string(rec_buffer[0]->ref->reference), std::string(writer_buff));
+    jsonPayload = variable_string_to_json(jsonPayload, std::string(rec_buffer[0]->ref->reference), std::string(writer_buff));
 
     /* Write out all other parameters */
     for (ii = 1; ii < rec_buffer.size() ; ii++) {
         copy_data_ascii_item(rec_buffer[ii], writer_offset, buf ); // This function is responsible for copying the value of the current parameter to the buf
-        json = variable_string_to_json(json, std::string(rec_buffer[ii]->ref->reference), std::string(writer_buff));
+        jsonPayload = variable_string_to_json(jsonPayload, std::string(rec_buffer[ii]->ref->reference), std::string(writer_buff));
     }
 
     // -- Add the fixed fields --
@@ -128,7 +130,9 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 
     json["currentEpochTime"] = now_time_t;
     json["creationDate"] = creationDate;
-    
+
+    json["payload"] = jsonPayload;
+
     // serialize it to BSON 
     std::vector<std::uint8_t> v = nlohmann::json::to_bson(json);
 
