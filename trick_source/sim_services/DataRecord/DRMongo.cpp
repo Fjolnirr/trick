@@ -1,15 +1,19 @@
- 
 /*
 PURPOSE:
-    (Data record in ascii format.)
+    (Data record to MongoDB in json format.)
 PROGRAMMERS:
      (((Robert W. Bailey) (LinCom Corp) (3/96) (SES upgrades)
      ((Alex Lin) (NASA) (April 2009) (--) (c++ port)))
+     ((Yusuf Can Anar) (TAI))
 */
 
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
+#include <ctime>
+#include <iomanip>
+#include <chrono>
 
 #include "trick/mongodb_handler.hh"
 #include "trick/MongoInstance.hh"
@@ -30,6 +34,9 @@ Trick::DRMongo::DRMongo( std::string in_name ) : Trick::DataRecordGroup( in_name
     mongoDbUri = "";
     databaseName = "trick"; 
     collectionName = in_name; 
+
+    // DataRecord permanent fields
+    groupId = "groupName";
 
     register_group_with_mm(this, "Trick::DRMongo") ;
 }
@@ -72,7 +79,6 @@ int Trick::DRMongo::format_specific_init() {
     return(0) ;
 }
 
-
 /**
 @details
 -# While there is data in memory that has not been written to disk
@@ -99,11 +105,29 @@ int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
 
     /* Write out all other parameters */
     for (ii = 1; ii < rec_buffer.size() ; ii++) {
-        // strcat(buf, delimiter.c_str() );
-        // buf += delimiter.length() ;
         copy_data_ascii_item(rec_buffer[ii], writer_offset, buf ); // This function is responsible for copying the value of the current parameter to the buf
         json = variable_string_to_json(json, std::string(rec_buffer[ii]->ref->reference), std::string(writer_buff));
     }
+
+    // -- Add the fixed fields --
+    // Group Name
+    json = variable_string_to_json(json, groupId, collectionName);
+
+    // current Date Time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+
+     std::tm* local_time = std::localtime(&now_time_t);
+
+    std::ostringstream oss;
+    oss << std::put_time(local_time, "%Y-%m-%dT%H:%M:%S");
+    // Append milliseconds
+    oss << '.' << std::setfill('0') << std::setw(3) << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() % 1000 << "+00:00";
+
+    std::string creationDate = oss.str();
+
+    json["currentEpochTime"] = now_time_t;
+    json["creationDate"] = creationDate;
     
     // serialize it to BSON 
     std::vector<std::uint8_t> v = nlohmann::json::to_bson(json);

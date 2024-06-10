@@ -2,7 +2,7 @@
 PURPOSE:
     (Data Record Ascii Mongo class.)
 PROGRAMMERS:
-    (((Yusuf Can Anar) (NASA) (2023)))
+    (((Yusuf Can Anar) (TAI) (2023)))
 */
 
 #ifndef DRMongo_HH
@@ -61,6 +61,8 @@ namespace Trick {
             std::string mongoDbUri;
             std::string databaseName; 
             std::string collectionName; 
+
+            std::string groupId; 
 
             #ifndef SWIG
             /**
