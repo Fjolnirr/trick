@@ -1,6 +1,6 @@
 # How to make mongocxx lib work 
 
-Run the `setup-mongocxx` file to install mongocxx driver to your system:
+Run the `setup-mongocxx` file in `$HOME` to install mongocxx driver to your system:
 - `sudo chmod +x setup-mongocxx`
 - `./setup-mongocxx`
 
