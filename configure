@@ -7337,7 +7337,7 @@ if test "$ac_cv_path_CLANG" = "noclang"; then :
 fi
 
 
-OLD_CLANG_LIBS="-lclangFrontend -lclangDriver -lclangSerialization -lclangParse -lclangSema -lclangAnalysis -lclangEdit -lclangAST -lclangLex -lclangBasic"
+OLD_CLANG_LIBS="-lclangFrontend -lclangDriver -lclangSerialization -lclangParse -lclangSema -lclangAnalysis -lclangEdit -lclangAST -lclangASTMatchers -lclangAPINotes -lclangLex -lclangBasic"
 NEW_CLANG_LIBS="-lclang-cpp"
 as_ac_File=`$as_echo "ac_cv_file_$LLVM_LIB_DIR/libclangFrontend.a" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $LLVM_LIB_DIR/libclangFrontend.a" >&5
