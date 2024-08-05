@@ -10,11 +10,17 @@
 # 'javadoc' - Generate Java Documentation.
 # 'doxygen' - Generate HTML User's Guide.
 # 'test'    - Run Unit-tests and Simulation Tests.
+# 'sc' 		- clear sim artifacts at workspacefolder
 
 export TRICK_HOME = $(CURDIR)
 
 # Include the build configuration information.
 include $(TRICK_HOME)/share/trick/makefiles/Makefile.common
+
+TRICK_CXXFLAGS += -O0 -g -I${TRICK_HOME}/third_party \
+			-I/usr/local/include/mongocxx/v_noabi \
+ 			-I/usr/local/include/bsoncxx/v_noabi \
+			-I/usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
 
 #-------------------------------------------------------------------------------
 # Specify the contents of: libtrick.a
@@ -198,7 +204,7 @@ $(ER7_UTILS_DIRS): icg_sim_serv
 # Replace -isystem with -I so ICG doesn't skip Trick headers
 icg_sim_serv: TRICK_SYSTEM_CXXFLAGS := $(subst -isystem,-I,$(TRICK_SYSTEM_CXXFLAGS))
 icg_sim_serv: $(ICG_EXE)
-	${ICG_EXE} -sim_services -m ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
+	${ICG_EXE} -sim_services -g -m ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
 
 # 1.1.1.4.1 Build the Interface Code Generator (ICG) executable.
 $(ICG_EXE) :
@@ -220,8 +226,7 @@ $(SWIG_DIRS): icg_sim_serv $(TRICK_LIB_DIR)
 # 1.2 Build Trick's Data-products Applications.
 .PHONY: dp
 dp: ${TRICK_HOME}/trick_source/trick_utils/units
-	@ $(MAKE) -C ${TRICK_HOME}/trick_source/data_products
-
+	@ $(MAKE) -C ${TRICK_HOME}/trick_source/data_products 
 #-------------------------------------------------------------------------------
 #
 
@@ -287,6 +292,12 @@ premade:
 	@ $(MAKE) -C ${TRICK_HOME}/trick_source/sim_services/MemoryManager premade
 	@ $(MAKE) -C ${TRICK_HOME}/trick_source/sim_services/CheckPointAgent premade
 	@ $(MAKE) -C ${TRICK_HOME}/trick_source/java
+
+# 1.6 this for sim artifacts generated in trick dir
+.PHONY: sc
+sc:
+	rm -rf varserver_log send_hs S_run_summary S_job_execution DP_Product DP_Product/ _init_log.csv
+
 
 ################################################################################
 #                                   TESTING
@@ -485,7 +496,7 @@ uninstall:
 # Replace -isystem with -I so ICG doesn't skip Trick headers
 ICG: TRICK_SYSTEM_CXXFLAGS := $(subst -isystem,-I,$(TRICK_SYSTEM_CXXFLAGS))
 ICG: $(ICG_EXE)
-	$(ICG_EXE) -f -s -m -n ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
+	$(ICG_EXE) -f -s -m -n -g ${TRICK_CXXFLAGS} ${TRICK_SYSTEM_CXXFLAGS} ${TRICK_HOME}/include/trick/files_to_ICG.hh
 
 
 ICG_EXE: force-icg-build

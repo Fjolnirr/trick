@@ -79,6 +79,7 @@
 
 #include "trick/DataRecordDispatcher.hh"
 #include "trick/DRAscii.hh"
+#include "trick/DRMongo.hh"
 #include "trick/DRBinary.hh"
 #include "trick/DRHDF5.hh"
 #include "trick/DebugPause.hh"

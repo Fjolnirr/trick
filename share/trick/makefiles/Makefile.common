@@ -74,6 +74,13 @@ export TRICK_SWIG_CFLAGS := $(TRICK_SWIG_CFLAGS)
 export TRICK_CONVERT_SWIG_FLAGS := $(TRICK_CONVERT_SWIG_FLAGS)
 export TRICK_TEST_FLAGS := $(TRICK_TEST_FLAGS)
 
+# This is required for 3rd party nlohmann/json header
+TRICK_SWIG_EXCLUDE += /$(TRICK_HOME)/third_party
+TRICK_ICG_EXCLUDE += $(TRICK_HOME)/third_party
+
+# This is required for 3rd party MongoDB library
+TRICK_EXEC_LINK_LIBS += -L/usr/local/lib -lpthread -lcrypto -lssl -lmongocxx -lbsoncxx
+
 IO_SRC_DIR       := io_src/
 OBJ_DIR          := object_${TRICK_HOST_CPU}
 TRICK_STATIC_LIB := ${TRICK_LIB_DIR}/libtrick.a

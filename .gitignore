@@ -32,7 +32,6 @@ trick-offline
 *sim_services_classes.resource
 civetweb_clone/
 include/civet/
-.vscode/
 civet_server_error.log
 server.pem
 archive/
@@ -43,3 +42,12 @@ trickops_logs/
 coverage.info
 *.dSYM
 *.log
+
+# This is generated because of the SIMS runned through vscodes gdb debugger
+varserver_log
+send_hs
+S_run_summary
+S_job_execution
+DP_Product
+DP_Product/
+_init_log.csv

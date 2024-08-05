@@ -1,33 +1,48 @@
- 
 /*
 PURPOSE:
-    (Data record in ascii format.)
+    (Data record to MongoDB in json format.)
 PROGRAMMERS:
      (((Robert W. Bailey) (LinCom Corp) (3/96) (SES upgrades)
      ((Alex Lin) (NASA) (April 2009) (--) (c++ port)))
+     ((Yusuf Can Anar) (TAI))
 */
 
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
+#include <ctime>
+#include <iomanip>
+#include <chrono>
 
-#include "trick/DRAscii.hh"
+#include "trick/mongodb_handler.hh"
+#include "trick/MongoInstance.hh"
+
+#include "trick/DRMongo.hh"
 #include "trick/command_line_protos.h"
 #include "trick/memorymanager_c_intf.h"
 #include "trick/message_proto.h"
 #include "trick/message_type.h"
 #include "trick/bitfield_proto.h"
 
-Trick::DRAscii::DRAscii( std::string in_name ) : Trick::DataRecordGroup( in_name ) {
+Trick::DRMongo::DRMongo( std::string in_name ) : Trick::DataRecordGroup( in_name ) {
 
     ascii_float_format = "%20.8g" ;
     ascii_double_format = "%20.16g" ;
     delimiter = ",";
-    register_group_with_mm(this, "Trick::DRAscii") ;
+
+    mongoDbUri = "";
+    databaseName = "trick"; 
+    collectionName = in_name; 
+
+    // DataRecord permanent fields
+    groupId = "groupName";
+
+    register_group_with_mm(this, "Trick::DRMongo") ;
 }
 
-int Trick::DRAscii::format_specific_header( std::fstream & out_st ) {
-    out_st << " is in ASCII" << std::endl ;
+int Trick::DRMongo::format_specific_header( std::fstream & out_st ) {
+    out_st << " is in ASCII & connected to the MongoDB" << std::endl ;
     return(0) ;
 }
 
@@ -43,17 +58,12 @@ int Trick::DRAscii::format_specific_header( std::fstream & out_st ) {
 -# Declare the recording group to the memory manager so that the group can be checkpointed
    and restored
 */
-int Trick::DRAscii::format_specific_init() {
+int Trick::DRMongo::format_specific_init() {
     
+     mongocxx::instance& mongo_instance = MongoInstance::get_instance(); //Consider moving this another place: multiple inits keeps calling this although this is a singleton class so it is safe to use.
+
     unsigned int jj ;
     std::streampos before_write;
-
-    /* Store log information in csv/txt file */
-    if ( ! delimiter.empty()  &&  delimiter.compare(",") != 0 ) {
-        file_name.append(".txt");
-    } else {
-        file_name.append(".csv");
-    }
 
     /* Calculate a "worst case" for space used for 1 record. */
     writer_buff_size = record_size * rec_buffer.size();
@@ -66,38 +76,6 @@ int Trick::DRAscii::format_specific_init() {
     }
     writer_buff[record_size * rec_buffer.size() - 1] = 1 ;
 
-    out_stream.open(file_name.c_str(), std::fstream::out | std::fstream::app ) ;
-    if ( !out_stream || !out_stream.good() ) {
-        message_publish(MSG_ERROR, "Can't open Data Record file %s.\n", file_name.c_str()) ;
-        record = false ;
-        return -1 ;
-    }
-    before_write = out_stream.tellp();
-    // Write out the title line of the recording file
-    /* Start with the 1st item in the buffer which should be "sys.exec.out.time" */
-    out_stream << rec_buffer[0]->ref->reference ;
-    if ( rec_buffer[0]->ref->attr->units != NULL ) {
-        if ( rec_buffer[0]->ref->attr->mods & TRICK_MODS_UNITSDASHDASH ) {
-            out_stream << " {--}" ;
-        } else {
-            out_stream << " {" << rec_buffer[0]->ref->attr->units << "}" ;
-        }
-    }
-    
-    /* Write out specified recorded parameters */
-    for (jj = 1; jj < rec_buffer.size() ; jj++) {
-        out_stream << delimiter << rec_buffer[jj]->ref->reference ;
-
-        if ( rec_buffer[jj]->ref->attr->units != NULL ) {
-            if ( rec_buffer[jj]->ref->attr->mods & TRICK_MODS_UNITSDASHDASH ) {
-                out_stream << " {--}" ;
-            } else {
-                out_stream << " {" << rec_buffer[jj]->ref->attr->units << "}" ;
-            }
-        }
-    }
-    out_stream << std::endl ;
-    total_bytes_written += out_stream.tellp() - before_write;
     return(0) ;
 }
 
@@ -110,62 +88,95 @@ int Trick::DRAscii::format_specific_init() {
 -# Flush the output file stream
 -# Return the number of bytes written
 */
-int Trick::DRAscii::format_specific_write_data(unsigned int writer_offset) {
+int Trick::DRMongo::format_specific_write_data(unsigned int writer_offset) {
+    #ifndef SWIG
+
+    trick::MongoDbHandler mongoDbHandler(mongoDbUri, databaseName, collectionName); //TODO move this to the constructor later
 
     unsigned int ii ;
     char *buf;
 
     buf = writer_buff ;
+    nlohmann::json json;
+    nlohmann::json jsonPayload;
 
+    
     /* Write out the first parameters (time) */
     copy_data_ascii_item(rec_buffer[0], writer_offset, buf );
-    buf += strlen(buf);
+    jsonPayload = variable_string_to_json(jsonPayload, std::string(rec_buffer[0]->ref->reference), std::string(writer_buff));
 
     /* Write out all other parameters */
     for (ii = 1; ii < rec_buffer.size() ; ii++) {
-        strcat(buf, delimiter.c_str() );
-        buf += delimiter.length() ;
-        copy_data_ascii_item(rec_buffer[ii], writer_offset, buf );
-        buf += strlen(buf);
+        copy_data_ascii_item(rec_buffer[ii], writer_offset, buf ); // This function is responsible for copying the value of the current parameter to the buf
+        jsonPayload = variable_string_to_json(jsonPayload, std::string(rec_buffer[ii]->ref->reference), std::string(writer_buff));
     }
 
-    out_stream << writer_buff << std::endl ;
+    // -- Add the fixed fields --
+    // Group Name
+    json = variable_string_to_json(json, groupId, collectionName);
 
-    /*! Flush the output */
-    out_stream.flush() ;
+    // current Date Time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+
+     std::tm* local_time = std::localtime(&now_time_t);
+
+    std::ostringstream oss;
+    oss << std::put_time(local_time, "%Y-%m-%dT%H:%M:%S");
+    // Append milliseconds
+    oss << '.' << std::setfill('0') << std::setw(3) << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() % 1000 << "+00:00";
+
+    std::string creationDate = oss.str();
+
+    json["currentEpochTime"] = now_time_t;
+    json["creationDate"] = creationDate;
+
+    json["payload"] = jsonPayload;
+
+    // serialize it to BSON 
+    std::vector<std::uint8_t> v = nlohmann::json::to_bson(json);
+
+    // create a bsoncxx::document::view from the data
+    auto fullDocument = bsoncxx::document::view(v.data(), v.size());
+    mongoDbHandler.add(fullDocument);
+
+    #endif
+
+    #ifdef SWIG
+    std::cout << "WARNING : SWIG usage blocking DRMongo format_specific_write_data" << endl;
+    #endif
+
     /*! +1 for endl */
     return(strlen(writer_buff) + 1) ;
 }
-
 /**
 @details
 -# Close the output file stream
 */
-int Trick::DRAscii::format_specific_shutdown() {
+int Trick::DRMongo::format_specific_shutdown() {
 
     if ( inited ) {
-
-        out_stream.close() ;
+        // std::cout << "MONGODB shutdown" << std::endl;
     }
     return(0) ;
 }
 
-int Trick::DRAscii::set_ascii_float_format( std::string in_float_format ) {
+int Trick::DRMongo::set_ascii_float_format( std::string in_float_format ) {
     ascii_float_format = in_float_format ;
     return(0) ;
 }
 
-int Trick::DRAscii::set_ascii_double_format( std::string in_double_format ) {
+int Trick::DRMongo::set_ascii_double_format( std::string in_double_format ) {
     ascii_double_format = in_double_format ;
     return(0) ;
 }
 
-int Trick::DRAscii::set_delimiter( std::string in_delimiter ) {
+int Trick::DRMongo::set_delimiter( std::string in_delimiter ) {
     delimiter = in_delimiter ;
     return(0) ;
 }
 
-int Trick::DRAscii::set_single_prec_only( bool in_single_prec_only ) {
+int Trick::DRMongo::set_single_prec_only( bool in_single_prec_only ) {
     Trick::DataRecordGroup::set_single_prec_only(in_single_prec_only) ;
     if( single_prec_only ) {
         ascii_double_format = "%20.8g";
@@ -176,7 +187,7 @@ int Trick::DRAscii::set_single_prec_only( bool in_single_prec_only ) {
     return(0) ;
 }
 
-int Trick::DRAscii::copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item_num, char *buf ) {
+int Trick::DRMongo::copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item_num, char *buf ) {
 
     char *address = 0;
 
@@ -262,3 +273,28 @@ int Trick::DRAscii::copy_data_ascii_item( Trick::DataRecordBuffer * DI, int item
 
     return(0) ;
 }
+
+int Trick::DRMongo::set_mongoDbUri( std::string in_mongoDbUri ) {
+    mongoDbUri = in_mongoDbUri;
+    return(0);
+}
+
+int Trick::DRMongo::set_databaseName( std::string in_databaseName ) {
+    databaseName = in_databaseName;
+    return(0);
+}
+
+int Trick::DRMongo::set_collectionName( std::string in_collectionName ) {
+    collectionName = in_collectionName;
+    return(0);
+}
+#ifndef SWIG
+nlohmann::json Trick::DRMongo::variable_string_to_json(nlohmann::json j, std::string str, std::string value){
+    replace(str.begin(), str.end(), '.', '/');
+    replace(str.begin(), str.end(), '[', '/');
+    str.erase(remove(str.begin(), str.end(), ']'), str.end());
+
+    j[nlohmann::json::json_pointer('/' + str)] = value;
+    return j;
+}
+#endif

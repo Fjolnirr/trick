@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {   
+            "name": "(gdb) Launch Cannon Analytic SimExe",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/trick_sims/Cannon/SIM_cannon_analytic/S_main_Linux_11.4_x86_64.exe",  
+            "args": ["./RUN_test/input.py"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/trick_sims/Cannon/SIM_cannon_analytic/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",  
+            "additionalSOLibSearchPath": "${workspaceFolder}/lib",
+            
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                { "text": "set output-radix 10" }
+            ]           
+        }            
+    ]
+}
