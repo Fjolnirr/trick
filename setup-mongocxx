@@ -16,6 +16,10 @@ function install_mongocxx_dependencies() {
   git clone https://github.com/mongodb/mongo-cxx-driver.git \
       --branch releases/stable --depth 1
   cd mongo-cxx-driver/build
+  # cd $TOP_DIR
+  # wget https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.10.2/mongo-cxx-driver-r3.10.2.tar.gz
+  # tar xzf mongo-cxx-driver-r3.10.2.tar.gz
+  # cd mongo-cxx-driver-r3.10.2/build
 
   sudo cmake .. \
       -DCMAKE_BUILD_TYPE=Release \
@@ -25,7 +29,7 @@ function install_mongocxx_dependencies() {
   sudo make
   sudo make install
   cd $TOP_DIR
-  rm -rf mongo-c-driver-1.25.0*
+  sudo rm -rf mongo-c-driver-1.25.0*
 }
 
 function main() {
